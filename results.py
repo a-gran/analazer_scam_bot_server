@@ -23,7 +23,7 @@ router = Router()
 # Объявляем асинхронную функцию:
 # message — объект сообщения (куда отправлять итоги),
 # session — финальное состояние игры со всеми результатами
-async def show_results(message: Message, session: dict):
+async def show_results(message, session):
     """
     Формирует и отправляет итоговый экран после завершения игры.
 

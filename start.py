@@ -33,7 +33,7 @@ router = Router()
 # Объявляем асинхронную функцию:
 # message — само сообщение от пользователя,
 # state — блокнот с состоянием конкретного пользователя
-async def handle_start(message: Message, state: FSMContext):
+async def handle_start(message, state):
     """
     Срабатывает когда пользователь пишет /start.
     Сбрасываем любое предыдущее состояние и показываем правила.
@@ -71,7 +71,7 @@ async def handle_start(message: Message, state: FSMContext):
 # Объявляем обработчик нажатия кнопки:
 # callback — объект нажатой кнопки (содержит данные о кнопке и сообщении),
 # state — блокнот с состоянием конкретного пользователя
-async def handle_play_again(callback: CallbackQuery, state: FSMContext):
+async def handle_play_again(callback, state):
     """
     Срабатывает при нажатии «Начать игру» или «Играть снова».
     Создаём новую сессию и показываем первый вопрос.

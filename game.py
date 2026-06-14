@@ -24,7 +24,7 @@ router = Router()
 # Объявляем асинхронную функцию:
 # message — объект сообщения (куда отправлять вопрос),
 # session — словарь с текущим состоянием игры
-async def send_question(message: Message, session: dict):
+async def send_question(message, session):
     """
     Формирует текст одного вопроса и отправляет его пользователю с кнопками.
 
@@ -77,7 +77,7 @@ async def send_question(message: Message, session: dict):
 # Объявляем обработчик ответа:
 # callback — нажатая кнопка (в ней есть callback.data и callback.message),
 # state — блокнот состояния пользователя
-async def handle_answer(callback: CallbackQuery, state: FSMContext):
+async def handle_answer(callback, state):
     """
     Обрабатывает нажатие кнопки «Скам» или «Безопасно».
 

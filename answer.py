@@ -6,8 +6,8 @@ from config import LIVES, POINTS
 
 
 # Объявляем функцию;
-# -> tuple[str, dict] означает что возвращает два значения: строку и словарь
-def process_answer(player: bool, case: dict, session: dict) -> tuple[str, dict]:
+# она возвращает два значения: строку и словарь
+def process_answer(player, case, session):
     """
     Проверяет ответ игрока и обновляет сессию.
 
@@ -57,7 +57,7 @@ def process_answer(player: bool, case: dict, session: dict) -> tuple[str, dict]:
 
 # Объявляем функцию;
 # принимает очки и количество вопросов, возвращает строку с «титулом»
-def final_title(score: int, total: int) -> str:
+def final_title(score, total):
     """
     Возвращает итоговое звание игрока в зависимости от результата.
     Логика полностью совпадает с оригинальным answer.py.

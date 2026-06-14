@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Функция создаёт клавиатуру с двумя кнопками — появляется под каждым вопросом
 # Кнопки расположены в одну строку рядом друг с другом
-def answer_keyboard() -> InlineKeyboardMarkup:
+def answer_keyboard():
     """Клавиатура с двумя кнопками — появляется под каждым вопросом."""
     # Создаём и сразу возвращаем клавиатуру
     # inline_keyboard — это список строк, каждая строка — список кнопок
@@ -22,7 +22,7 @@ def answer_keyboard() -> InlineKeyboardMarkup:
 
 
 # Функция создаёт клавиатуру с одной кнопкой — появляется на итоговом экране
-def play_again_keyboard() -> InlineKeyboardMarkup:
+def play_again_keyboard():
     """Клавиатура с одной кнопкой — появляется на итоговом экране."""
     # Одна строка с одной кнопкой «Играть снова»
     return InlineKeyboardMarkup(inline_keyboard=[[
@@ -35,7 +35,7 @@ def play_again_keyboard() -> InlineKeyboardMarkup:
 # Функция создаёт клавиатуру с одной кнопкой — появляется после показа правил
 # callback_data "play_again" намеренно совпадает с кнопкой «Играть снова»,
 # чтобы один обработчик в handlers/start.py работал для обоих случаев
-def start_keyboard() -> InlineKeyboardMarkup:
+def start_keyboard():
     """Клавиатура с одной кнопкой — появляется после показа правил."""
     # Одна строка с одной кнопкой «Начать игру»
     return InlineKeyboardMarkup(inline_keyboard=[[
