@@ -28,8 +28,8 @@ async def show_results(message, session):
     Формирует и отправляет итоговый экран после завершения игры.
 
     Принимает:
-      message — объект сообщения для ответа
-      session — финальное состояние сессии (correct, score, lives, total)
+        message — объект сообщения для ответа
+        session — финальное состояние сессии (correct, score, lives, total)
     """
     # Достаём из сессии количество правильных ответов
     correct = session["correct"]

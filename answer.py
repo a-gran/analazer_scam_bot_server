@@ -12,13 +12,13 @@ def process_answer(player, case, session):
     Проверяет ответ игрока и обновляет сессию.
 
     Параметры:
-      player  — ответ игрока: True (думает скам) / False (думает безопасно)
-      case    — текущий вопрос (словарь с ключами text, is_scam, explanation)
-      session — текущее состояние игры (lives, score, correct, ...)
+        player  — ответ игрока: True (думает скам) / False (думает безопасно)
+        case    — текущий вопрос (словарь с ключами text, is_scam, explanation)
+        session — текущее состояние игры (lives, score, correct, ...)
 
     Возвращает:
-      result_text — строка с результатом для отправки в Telegram (HTML-разметка)
-      session     — обновлённый словарь сессии
+        result_text — строка с результатом для отправки в Telegram (HTML-разметка)
+        session     — обновлённый словарь сессии
     """
     # Сравниваем ответ игрока (True/False) с правильным ответом из вопроса (is_scam: True/False)
     if player == case["is_scam"]:
