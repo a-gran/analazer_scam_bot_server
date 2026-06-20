@@ -1,13 +1,13 @@
 # Модуль html нужен, чтобы безопасно показывать текст вопросов в режиме HTML
 from html import escape
 
-# Из config.py берём POINTS — очки за правильный ответ
-from config import LIVES, POINTS
+# ИЗМЕНЕНИЕ team_2: Из config.py берём LIVES и максимум очков за один быстрый правильный ответ
+from config import LIVES, MAX_POINTS_PER_ANSWER
 
 
 # Объявляем функцию;
 # она возвращает два значения: строку и словарь
-def process_answer(player, case, session):
+def process_answer(player, case, session, points_for_answer):
     """
     Проверяет ответ игрока и обновляет сессию.
 
@@ -22,14 +22,18 @@ def process_answer(player, case, session):
     """
     # Сравниваем ответ игрока (True/False) с правильным ответом из вопроса (is_scam: True/False)
     if player == case["is_scam"]:
-        # Если совпали — добавляем очки к счёту игрока (например, +10)
-        session["score"] += POINTS
+        # ИЗМЕНЕНИЕ team_2: Запоминаем, сколько очков реально начислено за правильный ответ
+        awarded_points = points_for_answer
+        # ИЗМЕНЕНИЕ team_2: Если совпали — добавляем очки, которые заранее посчитаны по оставшемуся времени
+        session["score"] += awarded_points
         # И увеличиваем счётчик правильных ответов на 1
         session["correct"] += 1
         # Текст заголовка для правильного ответа
         header = "✅ <b>ПРАВИЛЬНО!</b>"
     # Если ответы не совпали — игрок ошибся
     else:
+        # ИЗМЕНЕНИЕ team_2: За неправильный ответ всегда начисляется ноль очков
+        awarded_points = 0
         # Уменьшаем количество жизней на 1 — как в игре, когда теряешь жизнь
         session["lives"] -= 1
         # Текст заголовка для неправильного ответа
@@ -47,8 +51,8 @@ def process_answer(player, case, session):
         f"{header}\n\n"
         # Объяснение из вопроса — почему это скам или почему безопасно
         f"💬 {explanation}\n\n"
-        # Текущее состояние жизней (в виде сердечек) и очков
-        f"Жизни: {lives_left}  |  Очки: {session['score']}"
+        # Текущее состояние жизней (в виде сердечек), очков и награды за этот ответ
+        f"Жизни: {lives_left}  |  Очки: {session['score']}  |  За ответ: +{awarded_points}"
     )
     # Возвращаем два значения сразу:
     # текст для отправки в Telegram и обновлённую сессию с новыми очками/жизнями
@@ -63,8 +67,8 @@ def final_title(score, total):
     Логика полностью совпадает с оригинальным answer.py.
     """
     # Вычисляем долю набранных очков от максимально возможного:
-    # максимум = total * POINTS (если правильно ответить на все вопросы)
-    percent = score / (total * POINTS)
+    # ИЗМЕНЕНИЕ team_2: Максимум = total * MAX_POINTS_PER_ANSWER, потому что очки теперь зависят от таймера
+    percent = score / (total * MAX_POINTS_PER_ANSWER)
     # Если набрал 80% и больше от максимума — высший титул
     if percent >= 0.8:
         return "🏆 <b>КИБЕРДЕТЕКТИВ</b> — отличный результат!"

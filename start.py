@@ -9,9 +9,8 @@ from aiogram.types import Message, CallbackQuery
 # где хранится текущее состояние и данные игры
 from aiogram.fsm.context import FSMContext
 
-# Из config.py берём константы: количество жизней и очков за правильный ответ —
-# они нужны чтобы показать правила в сообщении
-from config import LIVES, POINTS
+# ИЗМЕНЕНИЕ team_2: Из config.py берём жизни, лимит времени и максимум очков для текста правил
+from config import LIVES, ANSWER_TIME_LIMIT, MAX_POINTS_PER_ANSWER
 # Из states.py берём нашу группу состояний GameStates
 from states import GameStates
 # Из keyboards.py берём функцию, которая создаёт кнопку «Начать игру»
@@ -53,7 +52,10 @@ async def handle_start(message, state):
         "Определи: это <b>СКАМ</b> или безопасное сообщение?\n\n"
         # Показываем константы из config.py;
         # f"..." — f-строка позволяет вставлять переменные прямо в текст
-        f"❤️ Жизней: <b>{LIVES}</b>  |  ✨ За правильный ответ: <b>{POINTS} очков</b>\n\n"
+        # ИЗМЕНЕНИЕ team_2: Показываем игроку, что на каждый вопрос теперь есть ограничение времени
+        f"❤️ Жизней: <b>{LIVES}</b>  |  ⏱ На ответ: <b>{ANSWER_TIME_LIMIT} сек.</b>\n"
+        # ИЗМЕНЕНИЕ team_2: Показываем максимум очков за быстрый правильный ответ
+        f"✨ Максимум за правильный ответ: <b>{MAX_POINTS_PER_ANSWER} очков</b>\n\n"
         # Объяснение значения кнопки «Скам»
         "🚨 <b>Скам</b> — подозрительное сообщение\n"
         # Объяснение значения кнопки «Безопасно»
@@ -93,5 +95,5 @@ async def handle_play_again(callback, state):
     # теперь бот будет ждать нажатий кнопок «Скам»/«Безопасно»
     await state.set_state(GameStates.playing)
 
-    # Вызываем функцию из game.py — она отправит первый вопрос игроку
-    await send_question(callback.message, session)
+    # ИЗМЕНЕНИЕ team_2: Вызываем функцию из game.py и передаём state, чтобы она сохранила время старта вопроса
+    await send_question(callback.message, session, state)
