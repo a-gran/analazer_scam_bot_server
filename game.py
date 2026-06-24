@@ -20,8 +20,8 @@ from keyboards import answer_keyboard
 from answer import process_answer
 # Функция из session.py — возвращает текущий вопрос из сессии
 from session import get_current_case
-# ИЗМЕНЕНИЕ team_2: Из config.py берём лимит времени и максимум очков за один ответ
-from config import ANSWER_TIME_LIMIT, MAX_POINTS_PER_ANSWER
+# ИЗМЕНЕНИЕ team_2: Из config.py берём лимит времени, максимум очков и настройку фоновых таймеров
+from config import ANSWER_TIME_LIMIT, MAX_POINTS_PER_ANSWER, BACKGROUND_TIMERS
 
 # Создаём объект роутера для этого файла — он будет «хранить» все обработчики ниже
 router = Router()
@@ -85,8 +85,10 @@ async def send_question(message, session, state):
     # Отправляем текст вопроса с кнопками «Скам» и «Безопасно»;
     # parse_mode="HTML" — разрешаем теги жирного текста
     sent_message = await message.answer(text, parse_mode="HTML", reply_markup=answer_keyboard())
-    # ИЗМЕНЕНИЕ team_2: Запускаем фоновую задачу, которая сработает, если игрок не ответит вовремя
-    asyncio.create_task(handle_question_timeout(sent_message, state, session_id, question_token))
+    # Проверяем, разрешены ли фоновые таймеры в текущем режиме запуска
+    if BACKGROUND_TIMERS:
+        # ИЗМЕНЕНИЕ team_2: Запускаем фоновую задачу, которая сработает, если игрок не ответит вовремя
+        asyncio.create_task(handle_question_timeout(sent_message, state, session_id, question_token))
 
 
 # ИЗМЕНЕНИЕ team_2: Объявляем асинхронную функцию, которая ждёт лимит времени и завершает вопрос при молчании игрока
