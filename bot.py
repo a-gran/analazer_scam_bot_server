@@ -1,10 +1,6 @@
 # Подключаем модуль asyncio — он умеет делать несколько дел «одновременно»,
 # как шеф-повар, который следит за несколькими кастрюлями сразу
 import asyncio
-# Подключаем base64 — он помогает прочитать тело webhook, если платформа прислала его в закодированном виде
-import base64
-# Подключаем json — он превращает текст webhook от Telegram в обычный словарь Python
-import json
 # Подключаем модуль logging — он записывает всё что делает программа, как дневник
 import logging
 
@@ -45,77 +41,29 @@ def create_dispatcher():
     return dp
 
 
-# Создаём общий диспетчер один раз, чтобы webhook и локальный запуск использовали одинаковые правила
-dp = create_dispatcher()
-
-
-# Объявляем функцию, которая достаёт update Telegram из события cloud-function
-def _event_body_to_update(event):
-    # Берём body из события, а если body нет — считаем событие уже готовым словарём update
-    body = event.get("body", event)
-    # Проверяем, не пришло ли тело запроса в base64
-    if event.get("isBase64Encoded") and isinstance(body, str):
-        # Раскодируем base64 обратно в обычный текст JSON
-        body = base64.b64decode(body).decode("utf-8")
-    # Проверяем, осталось ли тело строкой
-    if isinstance(body, str):
-        # Превращаем JSON-строку в словарь Python
-        return json.loads(body or "{}")
-    # Возвращаем body как есть, если это уже словарь
-    return body
-
-
-# Объявляем асинхронную функцию обработки одного webhook update
-async def _handle_webhook(event):
-    # Достаём update Telegram из события Sourcecraft/Yandex Cloud Function
-    update = _event_body_to_update(event)
-    # Если update пустой или не похож на update Telegram, спокойно завершаем обработку
-    if not update or "update_id" not in update:
-        # Ничего не возвращаем, потому что это не ошибка Telegram-бота
-        return
-    # Создаём объект бота с токеном
-    bot = Bot(token=BOT_TOKEN)
-    # Начинаем блок, чтобы сессия бота закрылась даже при ошибке
-    try:
-        # Передаём update в aiogram так, как будто Telegram прислал его напрямую
-        await dp.feed_webhook_update(bot, update)
-    # Блок finally выполнится всегда
-    finally:
-        # Закрываем сетевую сессию бота
-        await bot.session.close()
-
-
-# Объявляем функцию handler — именно её вызывает Sourcecraft/Yandex Cloud Function
-def handler(event, context):
-    # Начинаем безопасный блок обработки webhook
-    try:
-        # Запускаем асинхронную обработку webhook из обычной cloud-function функции
-        asyncio.run(_handle_webhook(event))
-    # Ловим любую ошибку, чтобы Sourcecraft получил понятный HTTP-ответ
-    except Exception:
-        # Записываем подробность ошибки в логи функции
-        logging.exception("Failed to process Telegram webhook update")
-        # Возвращаем Telegram статус ошибки
-        return {"statusCode": 500, "body": "error"}
-    # Возвращаем Telegram успешный ответ
-    return {"statusCode": 200, "body": "ok"}
-
-
 # Объявляем главную асинхронную функцию main — она запускает весь бот
 # Слово async означает, что функция умеет «ждать» без зависания программы
 async def main():
     # Создаём объект бота и передаём ему токен —
     # теперь бот знает под каким именем он работает в Telegram
     bot = Bot(token=BOT_TOKEN)
+    # Создаём диспетчер — это центр, который раздаёт сообщения нужным обработчикам
+    dp = create_dispatcher()
     # Говорим Telegram: удали все старые сообщения, которые пришли пока бот спал —
     # чтобы не обрабатывать их заново при следующем запуске
     await bot.delete_webhook(drop_pending_updates=True)
 
     # Выводим в консоль сообщение, что бот успешно запустился
     print("Бот запущен. Нажми Ctrl+C для остановки.")
-    # Запускаем «поллинг» — бот начинает постоянно спрашивать Telegram:
-    # «Есть новые сообщения?» и обрабатывает их через диспетчер
-    await dp.start_polling(bot)
+    # Начинаем безопасный блок, чтобы соединение с Telegram закрылось при остановке
+    try:
+        # Запускаем «поллинг» — бот сам постоянно спрашивает Telegram:
+        # «Есть новые сообщения?» и обрабатывает их через диспетчер
+        await dp.start_polling(bot)
+    # Блок finally выполнится при обычной остановке и при ошибке
+    finally:
+        # Закрываем сетевую сессию бота, чтобы программа завершалась чисто
+        await bot.session.close()
 
 
 # Эта строка означает: «выполни следующий код только если запустили именно этот файл,

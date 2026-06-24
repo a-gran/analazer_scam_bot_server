@@ -28,8 +28,6 @@ POINTS = 10
 ANSWER_TIME_LIMIT = 15
 # ИЗМЕНЕНИЕ team_2: Сколько максимум очков можно получить за один правильный ответ
 MAX_POINTS_PER_ANSWER = 10
-# Читаем настройку BACKGROUND_TIMERS — можно ли запускать фоновые таймеры внутри процесса
-BACKGROUND_TIMERS = os.getenv("BACKGROUND_TIMERS", "true").lower() == "true"
 # Сколько вопросов выбирается из базы на одну игру
 COUNT = 20
 
